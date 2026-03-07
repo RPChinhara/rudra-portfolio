@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
-const BLOG_PASSWORD = "rudra2025"; // ← change this to your own password
+const BLOG_PASSWORD_HASH = "62d7c9e7dd5634792f7aec4279a96dc443d879d1a86f8122196454a33a8aefa7";
+
+async function hashPassword(pw) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
 
 function CursorGlow() {
   const dotRef = useRef(null);
@@ -49,8 +54,9 @@ export default function BlogPage() {
     setWriting(false);
   };
 
-  const login = () => {
-    if (pwInput === BLOG_PASSWORD) { setAuthed(true); setShowLogin(false); setPwError(false); setPwInput(""); }
+  const login = async () => {
+    const hash = await hashPassword(pwInput);
+    if (hash === BLOG_PASSWORD_HASH) { setAuthed(true); setShowLogin(false); setPwError(false); setPwInput(""); }
     else setPwError(true);
   };
 
