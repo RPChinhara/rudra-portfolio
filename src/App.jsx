@@ -16,11 +16,36 @@ const RESUME = {
     { role: "Research Intern", org: "Computational Health Sciences Lab, Ashoka University", period: "Apr 2022 – Jul 2022", bullets: ["Developed FAIR-compliant HPC workflows for large-scale RNA-seq data processing on multi-node clusters.", "Integrated a unified computational pipeline using 10+ bioinformatics tools.", "Performed disease–gene network analysis to identify novel associative links for translational research."] },
   ],
   projects: [
-    { title: "Smartphone Gait-Based Deep Learning for Smoking Risk Detection", period: "Sep – Nov 2025 · IIT Bombay", desc: "Developed a smartphone accelerometer-based digital biomarker system using a 93-subject gait dataset for smoker vs non-smoker classification. Designed a hybrid LSTM + feed-forward neural network (5.6K parameters). Applied Integrated Gradients for model interpretability.", tags: ["LSTM", "Digital Biomarkers", "Focal Loss", "Explainability"] },
-    { title: "Causal Analysis of Alcohol Abuse on Employment", period: "Sep – Oct 2025 · IIT Bombay", desc: "Implemented 2SLS, 2SRI, and Bivariate Probit models to estimate causal impact of alcohol abuse on employability. Analyzed 9,822 observations with 33 socioeconomic features.", tags: ["Causal Inference", "2SLS", "Econometrics", "R"] },
-    { title: "Tumor Micro-Environment Network Analysis", period: "Mar – Apr 2024 · KCDH, Ashoka University", desc: "Implemented multiplex mIHC/WSI spatial network analysis across 40+ patient whole-slide images. Constructed cell-level graphs using 35 µm neighborhood rules.", tags: ["WSI Analysis", "Network Graphs", "mIHC"] },
-    { title: "Evaluating Structured Physiotherapy with Omaveloxolone for Friedreich Ataxia", period: "Sep – Nov 2025 · IIT Bombay", desc: "Designed a two-arm parallel RCT. Built a CRF with 120+ data fields. Mapped all variables to CDISC SDTM domains. Designed a normalized clinical database with 15+ relational tables.", tags: ["Clinical Trials", "CDISC SDTM", "RCT"] },
-    { title: "Cold Start Item Recommendation System", period: "Aug – Dec 2023 · Central University of Haryana", desc: "Implemented Attribute-Fused SVD, LearnMAP, LearnAROMA, and DynamicBPR from scratch. Developed an incremental update mechanism reducing exploration load by 71% while maintaining 95–97% accuracy.", tags: ["Recommender Systems", "SVD", "DynamicBPR"] },
+    {
+    title: "Gait2Health — Smartphone Gait-Based Deep Learning for Smoking Risk Detection",
+    period: "Sep – Nov 2025 · IIT Bombay",
+    desc: `Developed a smartphone accelerometer–based digital biomarker system for classifying smoker vs non-smoker gait patterns using a 93-subject dataset. Designed a lightweight hybrid LSTM + feed-forward neural architecture (~5.6K parameters) optimized for mobile inference. Benchmarked against Vector Autoregression and demonstrated model assumption failures under nonlinear gait dynamics. Addressed class imbalance and noisy time-series data using weighted BCE, focal loss, cosine-annealing learning rate, and warm-restart SGD, achieving F1 ≈ 0.87. Applied Integrated Gradients to interpret model predictions and identify discriminative biomechanical gait features linked to smoking-related physiological changes.`,
+    tags: ["Deep Learning", "Digital Biomarkers", "LSTM", "Explainable AI"]
+    },
+    {
+    title: "Evaluating Structured Physiotherapy with Omaveloxolone for Friedreich Ataxia",
+    period: "Sep – Nov 2025 · IIT Bombay",
+    desc: `Designed a clinical trial framework to evaluate combined pharmacological and physiotherapy intervention for Friedreich Ataxia patients. Developed a two-arm parallel randomized controlled trial with power-based sample size estimation (α = 0.05, power = 80%) and defined inclusion–exclusion criteria across 25+ clinical variables. Built a comprehensive Case Report Form (CRF) containing 120+ structured data fields spanning clinical outcomes, vitals, laboratory markers, genetic information, adverse events, and physiotherapy adherence. Mapped trial variables to CDISC SDTM domains to ensure regulatory-grade interoperability. Designed a normalized clinical database schema with 15+ relational tables and a complete ER model for longitudinal patient monitoring.`,
+    tags: ["Clinical Trials", "Clinical Data Management", "CDISC SDTM", "Database Design"]
+    },
+    {
+    title: "Causal Analysis of Alcohol Abuse on Employment",
+    period: "Sep – Oct 2025 · IIT Bombay",
+    desc: `Developed causal inference models to estimate the effect of alcohol abuse on employability while correcting for endogeneity and omitted variable bias. Implemented and compared 2SLS, Bivariate Probit, and Two-Stage Residual Inclusion (2SRI) models on a dataset of 9,822 observations with 33 socioeconomic variables. Conducted robustness checks including Wu-Hausman endogeneity tests and Sargan tests for instrument validity. Demonstrated that naive regression underestimated the negative causal impact of substance abuse by over 15 percentage points, with causal estimates ranging from −19% to −34% compared to −2% from baseline models.`,
+    tags: ["Causal Inference", "Econometrics", "2SLS", "Statistical Modeling"]
+    },
+    {
+    title: "Tumor Micro-Environment Network Analysis",
+    period: "Mar – Apr 2024 · KCDH, Ashoka University",
+    desc: `Implemented spatial network analysis on multiplex mIHC whole-slide imaging data across 40+ patient samples to study tumor-immune micro-environment interactions. Constructed cell-level graphs using 35µm neighborhood rules and engineered graph topology features including mixing score, clustering coefficient, stromal barrier metrics, and modularity. Demonstrated phenotypic separability between cold, mixed, and compartmentalized tumor micro-environments. Validated hypothesized interaction structures using correlation analysis on 22 MIBI samples.`,
+    tags: ["Computational Pathology", "Network Analysis", "WSI", "Graph Modeling"]
+    },
+    {
+    title: "Cold Start Item Recommendation System",
+    period: "Aug – Dec 2023 · Central University of Haryana",
+    desc: `Developed an item cold-start recommendation system using the MovieLens-200k dataset with a modular experimentation pipeline for recommender model comparison. Implemented Attribute-Fused SVD, LearnMAP, LearnAROMA, and DynamicBPR from scratch and designed an attribute-space → latent-space projection framework to improve recommendations for new items. Built an incremental update mechanism using DynamicBPR to update item vectors without full retraining, reducing exploration load by 71% while maintaining 95–97% of full-model accuracy.`,
+    tags: ["Recommender Systems", "Matrix Factorization", "SVD", "Ranking Models"]
+    }
   ],
   skills: [
     { title: "Programming", items: "Python, R, SQL, Bash, SPARQL" },
@@ -128,6 +153,18 @@ export default function App() {
         ))}
       </section>
 
+      {/* Publications */}
+      {/* <section id="publications">
+        <h2>Publications</h2>
+        {RESUME.publications.map((pub, i) => (
+          <div key={i} className="entry">
+            <h3>{pub.title}</h3>
+            <div className="meta">{pub.authors} · {pub.venue} · {pub.year}</div>
+            <p>{pub.abstract}</p>
+          </div>
+        ))}
+      </section> */}
+
       {/* Projects */}
       <section id="projects">
         <h2>Projects</h2>
@@ -155,18 +192,6 @@ export default function App() {
           </tbody>
         </table>
       </section>
-
-      {/* Publications */}
-      {/* <section id="publications">
-        <h2>Publications</h2>
-        {RESUME.publications.map((pub, i) => (
-          <div key={i} className="entry">
-            <h3>{pub.title}</h3>
-            <div className="meta">{pub.authors} · {pub.venue} · {pub.year}</div>
-            <p>{pub.abstract}</p>
-          </div>
-        ))}
-      </section> */}
 
       {/* Footer */}
       <div style={{ marginTop: 56, fontSize: 13, color: "#555", borderTop: "1px solid #333", paddingTop: 18 }}>
