@@ -45,10 +45,12 @@ const RESUME = {
 function CursorGlow() {
   const dotRef = useRef(null);
   const haloRef = useRef(null);
+  const isTouchDevice = window.matchMedia("(hover: none)").matches;
+
   useEffect(() => {
+    if (isTouchDevice) return;
     const dot = dotRef.current;
     const halo = haloRef.current;
-    // Hide default cursor site-wide
     document.body.style.cursor = "none";
     const move = (e) => {
       dot.style.left = e.clientX + "px";
@@ -77,28 +79,13 @@ function CursorGlow() {
       window.removeEventListener("mouseover", over);
       window.removeEventListener("mouseout", out);
     };
-  }, []);
+  }, [isTouchDevice]);
+
+  if (isTouchDevice) return null;
   return (
     <>
-      {/* Outer halo */}
-      <div ref={haloRef} style={{
-        position: "fixed", pointerEvents: "none", zIndex: 9997,
-        width: 32, height: 32, borderRadius: "50%",
-        border: "1px solid rgba(77,232,194,0.5)",
-        transform: "translate(-50%,-50%)",
-        transition: "left 0.1s ease, top 0.1s ease, transform 0.2s ease, opacity 0.2s ease",
-        opacity: 0.35,
-        boxShadow: "0 0 12px rgba(77,232,194,0.25)",
-      }} />
-      {/* Core dot */}
-      <div ref={dotRef} style={{
-        position: "fixed", pointerEvents: "none", zIndex: 9998,
-        width: 6, height: 6, borderRadius: "50%",
-        background: "#4de8c2",
-        transform: "translate(-50%,-50%)",
-        transition: "left 0.04s linear, top 0.04s linear, transform 0.2s ease",
-        boxShadow: "0 0 8px 2px rgba(77,232,194,0.7), 0 0 20px 4px rgba(77,232,194,0.3)",
-      }} />
+      <div ref={haloRef} style={{ position: "fixed", pointerEvents: "none", zIndex: 9997, width: 32, height: 32, borderRadius: "50%", border: "1px solid rgba(77,232,194,0.5)", transform: "translate(-50%,-50%)", transition: "left 0.1s ease, top 0.1s ease, transform 0.2s ease, opacity 0.2s ease", opacity: 0.35, boxShadow: "0 0 12px rgba(77,232,194,0.25)" }} />
+      <div ref={dotRef} style={{ position: "fixed", pointerEvents: "none", zIndex: 9998, width: 6, height: 6, borderRadius: "50%", background: "#4de8c2", transform: "translate(-50%,-50%)", transition: "left 0.04s linear, top 0.04s linear, transform 0.2s ease", boxShadow: "0 0 8px 2px rgba(77,232,194,0.7), 0 0 20px 4px rgba(77,232,194,0.3)" }} />
     </>
   );
 }
@@ -115,6 +102,17 @@ function useReveal() {
     els.forEach(el => obs.observe(el));
     return () => obs.disconnect();
   });
+}
+
+// ── Mobile detection hook ─────────────────────────────────────────────────────
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return isMobile;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -206,9 +204,10 @@ function MoreProjects({ tagStyle }) {
 }
 
 // ── Main App ──────────────────────────────────────────────────────────────────
-export default function App() {
+export default function Portfolio() {
   const [scrollPct, setScrollPct] = useState(0);
   const [activeSection, setActiveSection] = useState("hero");
+  const isMobile = useIsMobile();
 
   useReveal();
 
@@ -253,6 +252,15 @@ export default function App() {
         @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0; } }
         @keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+          .nav-links { display: none !important; }
+          .edu-grid { grid-template-columns: 1fr !important; }
+          .exp-grid { grid-template-columns: 1fr !important; gap: 4px !important; }
+          .exp-date { text-align: left !important; }
+          .exp-body { padding-left: 20px !important; }
+          .exp-connector { display: none !important; }
+          .section-pad { padding: 60px 0 !important; }
+        }
       `}</style>
 
       <CursorGlow />
@@ -265,7 +273,7 @@ export default function App() {
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, background: "rgba(8,12,16,0.88)", backdropFilter: "blur(16px)", borderBottom: "1px solid rgba(100,200,180,0.1)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 32px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 14, letterSpacing: "0.12em", textTransform: "uppercase", color: "#4de8c2" }}>RC</div>
-          <div style={{ display: "flex", gap: 28 }}>
+          <div className="nav-links" style={{ display: "flex", gap: 28 }}>
             {navLinks.map(id => (
               <a key={id} href={`#${id}`}
                 style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: activeSection === id ? "#4de8c2" : "#6b8f85", textDecoration: "none", transition: "color 0.2s" }}>
@@ -308,10 +316,10 @@ export default function App() {
       </section>
 
       {/* EDUCATION */}
-      <section id="about" style={{ padding: "100px 0" }}>
+      <section id="about" className="section-pad" style={{ padding: "100px 0" }}>
         <div style={S.container}>
           <SectionHeader num="01" title="Education" />
-          <div className="reveal" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div className="reveal edu-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             {RESUME.education.map(ed => (
               <div key={ed.school}
                 style={{ background: "#0d1318", border: "1px solid rgba(100,200,180,0.12)", borderRadius: 6, padding: 28, transition: "border-color 0.2s" }}
@@ -334,17 +342,17 @@ export default function App() {
       </section>
 
       {/* EXPERIENCE */}
-      <section id="experience" style={{ padding: "100px 0" }}>
+      <section id="experience" className="section-pad" style={{ padding: "100px 0" }}>
         <div style={S.container}>
           <SectionHeader num="02" title="Experience" />
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {RESUME.experience.map((exp, i) => (
-              <div key={i} className="reveal" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "0 40px", position: "relative", paddingBottom: i < RESUME.experience.length - 1 ? 48 : 0 }}>
+              <div key={i} className="reveal exp-grid" style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "0 40px", position: "relative", paddingBottom: i < RESUME.experience.length - 1 ? 48 : 0 }}>
                 {i < RESUME.experience.length - 1 && (
-                  <div style={{ position: "absolute", left: "calc(200px + 60px)", top: 8, bottom: 0, width: 1, background: "linear-gradient(to bottom, #4de8c2, rgba(100,200,180,0.1))" }} />
+                  <div className="exp-connector" style={{ position: "absolute", left: "calc(200px + 60px)", top: 8, bottom: 0, width: 1, background: "linear-gradient(to bottom, #4de8c2, rgba(100,200,180,0.1))" }} />
                 )}
-                <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: "0.05em", color: "#6b8f85", textAlign: "right", paddingTop: 2 }}>{exp.period}</div>
-                <div style={{ paddingLeft: 48, position: "relative" }}>
+                <div className="exp-date" style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: "0.05em", color: "#6b8f85", textAlign: "right", paddingTop: 2 }}>{exp.period}</div>
+                <div className="exp-body" style={{ paddingLeft: 48, position: "relative" }}>
                   <div style={{ position: "absolute", left: -8, top: 5, width: 8, height: 8, borderRadius: "50%", background: "#4de8c2", boxShadow: "0 0 10px #4de8c2", transform: "translateX(16px)" }} />
                   <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 600, fontSize: 17, color: "#fff", marginBottom: 2 }}>{exp.role}</div>
                   <div style={{ fontFamily: "'DM Mono', monospace", fontSize: 12, color: "#4de8c2", letterSpacing: "0.05em", marginBottom: 12 }}>{exp.org}</div>
@@ -363,7 +371,7 @@ export default function App() {
       </section>
 
       {/* PROJECTS */}
-      <section id="projects" style={{ padding: "100px 0" }}>
+      <section id="projects" className="section-pad" style={{ padding: "100px 0" }}>
         <div style={S.container}>
           <SectionHeader num="03" title="Selected Projects" />
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -394,7 +402,7 @@ export default function App() {
       </section>
 
       {/* SKILLS */}
-      <section id="skills" style={{ padding: "100px 0" }}>
+      <section id="skills" className="section-pad" style={{ padding: "100px 0" }}>
         <div style={S.container}>
           <SectionHeader num="04" title="Technical Skills" />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
@@ -417,9 +425,8 @@ export default function App() {
 
       {/* FOOTER */}
       <footer style={{ borderTop: "1px solid rgba(100,200,180,0.1)", padding: "24px 0", position: "relative", zIndex: 1 }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 32px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#5a7a72", letterSpacing: "0.06em" }}>© 2025 Rudrapratap Chinhara</span>
-          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#5a7a72", letterSpacing: "0.06em" }}>IIT Bombay · Digital Health Research</span>
+        <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 32px", textAlign: "center" }}>
+          <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 11, color: "#5a7a72", letterSpacing: "0.07em" }}>Rudrapratap Chinhara · M.S. Researcher · Koita Centre for Digital Health · IIT Bombay</span>
         </div>
       </footer>
 
