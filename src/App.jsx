@@ -59,6 +59,20 @@ export default function App() {
       `}</style>
 
       {/* Header */}
+      <div style={{ marginBottom: 24, display: "flex", alignItems: "center", gap: 18 }}>
+  
+      <img
+        src="/profile.jpeg"
+        alt="Rudrapratap Chinhara"
+        style={{
+          width: 120,
+          height: 120,
+          borderRadius: "50%",
+          objectFit: "cover",
+          border: "1px solid #333"
+        }}
+      />
+
       <div style={{ marginBottom: 24 }}>
         <h1>Rudrapratap Chinhara</h1>
         <div style={{ fontSize: 14, color: "#777", marginBottom: 14 }}>
@@ -71,6 +85,7 @@ export default function App() {
           <a href="#skills">skills</a>
           <Link to="/blog" style={{ fontSize: 14, color: "#888" }}>blog</Link>
         </nav>
+      </div>
       </div>
 
       <hr />
