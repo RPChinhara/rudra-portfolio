@@ -127,8 +127,34 @@ export default function App() {
       {/* About */}
       <section id="about">
         <p>
-          I am an M.S. by Research student at <a href="https://www.iitb.ac.in" target="_blank" rel="noreferrer">IIT Bombay</a>, affiliated with the <a href="https://www.kcdh.iitb.ac.in" target="_blank" rel="noreferrer">Koita Centre for Digital Health</a>. My work sits at the intersection of deep learning, knowledge graphs, and large-scale data engineering — designing neural architectures, building ETL pipelines, and developing LLM-based systems.
-        </p>
+          Hi there! I am currently an M.S. by Research student at the
+          <a href="https://kcdh.iitb.ac.in/" target="_blank">Koita Centre for Digital Health</a>
+          at
+          <a href="https://www.iitb.ac.in/" target="_blank">Indian Institute of Technology Bombay</a>.
+          My work focuses on developing machine learning systems and data infrastructures for large-scale scientific and healthcare datasets.
+          </p>
+
+          <p>
+          My technical interests span deep learning, knowledge graphs, network science, and large-scale data engineering.
+          I work on designing deep neural architectures, building ETL pipelines for heterogeneous datasets,
+          and developing systems that integrate machine learning with structured and unstructured data sources.
+          I am particularly interested in scalable data pipelines, representation learning,
+          and graph-based modeling of complex systems.
+          </p>
+
+          <p>
+          Before joining IIT Bombay, I completed my B.Tech in Computer Science and Engineering from the
+          <a href="https://www.cuh.ac.in/" target="_blank">Central University of Haryana</a>.
+          During this time, I worked on several research projects involving large-scale data processing,
+          network analysis, and computational pipelines, and later continued working on Knowledge Graphs and AI systems through research internships at
+          <a href="https://www.ashoka.edu.in/" target="_blank">Ashoka University</a>.
+          </p>
+
+          <p>
+          My broader goal is to build robust, scalable AI systems capable of extracting structure,
+          relationships, and insights from large, complex datasets.
+          </p>
+
         <p style={{ marginTop: 8 }}>
           <a href={`mailto:${RESUME.email}`}>{"Email"}</a>
           {" · "}
@@ -136,6 +162,8 @@ export default function App() {
           {" · "}
           <a href={RESUME.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
         </p>
+
+        <hr />
 
         <h2>Education</h2>
         {RESUME.education.map((ed, i) => (
