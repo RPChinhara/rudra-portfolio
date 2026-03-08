@@ -63,6 +63,9 @@ const RESUME = {
   // publications: [
   //   { title: "Integrating Indian Drug Data with International Standards for Enhanced Interoperability", authors: "Rudrapratap Chinhara, Ashish Kumar, Dr. Anshul Kundra", venue: "Journal of Biomedical Informatics (Under Review)", year: "2024", abstract: "This paper presents a comprehensive framework for integrating Indian drug data with international standards to enhance interoperability in healthcare systems. We developed an automated ETL pipeline to map 253,617+ Indian brand drug records to OMOP CDM vocabularies using PubChem IDs and SNOMED-CT. Our approach addresses challenges in data heterogeneity and standardization, enabling seamless integration with global drug databases. The resulting unified dataset facilitates improved clinical decision support and research applications." },
   // ]
+  awards: [
+    { title: "Dr. Nitish Thakor Fellowship Award", issuer: "Koita Centre for Digital Health", year: "2026" }
+  ]
 };
 
 export default function App() {
@@ -117,6 +120,7 @@ export default function App() {
           <a href="#projects">projects</a>
           <a href="#skills">skills</a>
           <a href="#publications">publications</a>
+          <a href="#awards">awards</a>
           <Link to="/blog" style={{ fontSize: 14, color: "#888" }}>blog</Link>
         </nav>
       </div>
@@ -212,6 +216,17 @@ export default function App() {
             ))}
           </tbody>
         </table>
+      </section>
+      
+      {/* Awards */}
+      <section id="awards">
+        <h2>Awards</h2>
+        {RESUME.awards.map((aw, i) => (
+          <div key={i} className="entry">
+            <h3>{aw.title}</h3>
+            <div className="meta">{aw.issuer} · {aw.year}</div>
+          </div>
+        ))}
       </section>
 
       {/* Footer */}
