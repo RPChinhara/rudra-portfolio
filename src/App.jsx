@@ -61,7 +61,7 @@ const RESUME = {
       { title: "Systems & Dev", items: "Linux, HPC, System Administration, Git, API Development, Bioinformatics" },
   ],
   publications: [
-    { title: "Blood transcriptomics reveal IL-10-modulated Neutrophil-Monocyte axis is associated with hypertrophic cardiomyopathy in Friedreich's Ataxia", authors: "Dr Mohammed Faruq et al.", venue: "TBA (Under Review)", year: "2025", abstract: "Friedreich’s ataxia (FRDA) caused by biallelic Frataxin (FXN) loss is classically a neurological disorder, yet cardiomyopathy is the leading cause of mortality. To identify peripheral transcriptomic markers, this study profiled blood from FRDA patients. Bulk mRNA sequencing of 52 patients versus 12 controls confirmed FXN down-regulation and revealed immune dysregulation signatures, especially neutrophil degranulation pathways. Single-cell RNA sequencing of PBMCs (16 patients, 15 controls) showed an expanded CD14⁺ monocyte pool, including an IL-10–producing subpopulation. Complementary whole-blood scRNA-seq (4 patients, 4 controls) demonstrated neutrophils with a STAT1-driven interferon/Ly6Ehi profile. Clinically, a higher neutrophil-to-lymphocyte ratio correlated with hypertrophic cardiomyopathy, while IL-10 levels in monocytes were lower in affected patients. Survival analysis identified IL10RB expression as a protective factor against FRDA-related cardiomyopathy. Collectively, the study delivers a transcriptomic atlas of the peripheral immune landscape in FRDA and implicates a neutrophil–monocyte axis, orchestrated by IL-10, as a modulator of inflammation, disease heterogeneity, and a promising source of blood-based biomarkers.", doi: "TBA" },
+    { title: "Blood transcriptomics reveal IL-10-modulated Neutrophil-Monocyte axis is associated with hypertrophic cardiomyopathy in Friedreich's Ataxia", authors: "Dr Mohammed Faruq, Ms Shweta Sahni, Mr Vivek anand, Ms Asangla Kamai, Dr Istaq Ahmad, Mr Zubair Bhat, Ms Pooja Sharma, Mr Manish Kumar, <strong>Mr Rudra Chinhara</strong>, Ms Bableen Kaur, Dr Rintu Kutum ,Dr Muvin Khan ,Dr Akhilesh Sonakar ,Professor Achal Srivastava", venue: "TBA (Under Review)", year: "2025", abstract: "Friedreich’s ataxia (FRDA) caused by biallelic Frataxin (FXN) loss is classically a neurological disorder, yet cardiomyopathy is the leading cause of mortality. To identify peripheral transcriptomic markers, this study profiled blood from FRDA patients. Bulk mRNA sequencing of 52 patients versus 12 controls confirmed FXN down-regulation and revealed immune dysregulation signatures, especially neutrophil degranulation pathways. Single-cell RNA sequencing of PBMCs (16 patients, 15 controls) showed an expanded CD14⁺ monocyte pool, including an IL-10–producing subpopulation. Complementary whole-blood scRNA-seq (4 patients, 4 controls) demonstrated neutrophils with a STAT1-driven interferon/Ly6Ehi profile. Clinically, a higher neutrophil-to-lymphocyte ratio correlated with hypertrophic cardiomyopathy, while IL-10 levels in monocytes were lower in affected patients. Survival analysis identified IL10RB expression as a protective factor against FRDA-related cardiomyopathy. Collectively, the study delivers a transcriptomic atlas of the peripheral immune landscape in FRDA and implicates a neutrophil–monocyte axis, orchestrated by IL-10, as a modulator of inflammation, disease heterogeneity, and a promising source of blood-based biomarkers.", doi: "TBA" },
   ],
   awards: [
     { title: "Dr. Nitish Thakor Fellowship Award", issuer: "Koita Centre for Digital Health", year: "2026" }
@@ -191,7 +191,12 @@ export default function App() {
         {RESUME.publications.map((pub, i) => (
           <div key={i} className="entry">
             <h3>{pub.title}</h3>
-            <div className="meta">{pub.authors} · {pub.venue} · {pub.year}</div>
+            <div
+                className="meta"
+                dangerouslySetInnerHTML={{
+                  __html: `${pub.authors} · ${pub.venue} · ${pub.year}`,
+                }}
+              />
             <p style={{ textAlign: "justify" }}>{pub.abstract}</p>
             {pub.doi && (<p><a href={`https://doi.org/${pub.doi}`} target="_blank" rel="noreferrer">DOI: {pub.doi}</a></p>)}
           </div>
