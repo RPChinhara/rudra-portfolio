@@ -184,7 +184,7 @@ export default function BlogPage() {
           <p className="academic-kicker">Notes and Writing</p>
           <h1>Blog</h1>
           <p className="academic-role" style={{ textAlign: "justify" }}>
-            I write about my research, thoughts on machine learning and systems, and occasionally share updates about my work. This is also where I post drafts of my papers and projects for early feedback, so stay tuned!
+            I write about my research and occasionally share updates about my work. This is also where I post drafts of my papers and projects for early feedback, so stay tuned!
           </p>
 
           <div className="academic-side-block">
