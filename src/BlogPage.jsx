@@ -1,31 +1,41 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "./supabase";
 
-const BLOG_PASSWORD_HASH = "62d7c9e7dd5634792f7aec4279a96dc443d879d1a86f8122196454a33a8aefa7"; // replace with your hash
+const BLOG_PASSWORD_HASH = "62d7c9e7dd5634792f7aec4279a96dc443d879d1a86f8122196454a33a8aefa7";
+const DATE_FORMATTER = new Intl.DateTimeFormat("en-IN", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+});
 
 async function hashPassword(pw) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(new Uint8Array(buf))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function formatDate(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return DATE_FORMATTER.format(date);
+}
+
+function shouldClamp(body) {
+  return body.length > 480 || body.split("\n").length > 6;
 }
 
 export default function BlogPage() {
   const [posts, setPosts] = useState([]);
-
-useEffect(() => {
-  async function loadPosts() {
-    const { data, error } = await supabase
-    .from("posts")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-    console.log("Supabase result:", data, error);
-
-    if (!error) setPosts(data || []);
-  }
-
-  loadPosts();
-  }, []);
+  const [loading, setLoading] = useState(true);
   const [authed, setAuthed] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [pwInput, setPwInput] = useState("");
@@ -36,33 +46,56 @@ useEffect(() => {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ title: "", body: "", tags: "" });
 
-  useEffect(() => { document.body.style.background = "#1e1e1e"; }, []);
+  useEffect(() => {
+    let alive = true;
+
+    async function loadPosts() {
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error && alive) {
+        setPosts(data || []);
+      }
+
+      if (alive) {
+        setLoading(false);
+      }
+    }
+
+    loadPosts();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const publish = async () => {
-  if (!form.title.trim() || !form.body.trim()) return;
+    if (!form.title.trim() || !form.body.trim()) {
+      return;
+    }
 
-  const { data, error } = await supabase
-    .from("posts")
-    .insert([
-      {
-        title: form.title,
-        body: form.body,
-        tags: form.tags.split(",").map(t => t.trim()).filter(Boolean)
-      }
-    ])
-    .select();
+    const { data, error } = await supabase
+      .from("posts")
+      .insert([
+        {
+          title: form.title,
+          body: form.body,
+          tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+        },
+      ])
+      .select();
 
-  console.log("insert result:", data, error);
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  setPosts([data[0], ...posts]);
-  setForm({ title: "", body: "", tags: "" });
-  setWriting(false);
-};
+    setPosts((current) => [data[0], ...current]);
+    setForm({ title: "", body: "", tags: "" });
+    setWriting(false);
+  };
 
   const startEdit = (post) => {
     setWriting(false);
@@ -70,7 +103,7 @@ useEffect(() => {
     setEditForm({
       title: post.title || "",
       body: post.body || "",
-      tags: Array.isArray(post.tags) ? post.tags.join(", ") : ""
+      tags: Array.isArray(post.tags) ? post.tags.join(", ") : "",
     });
   };
 
@@ -80,12 +113,14 @@ useEffect(() => {
   };
 
   const saveEdit = async (id) => {
-    if (!editForm.title.trim() || !editForm.body.trim()) return;
+    if (!editForm.title.trim() || !editForm.body.trim()) {
+      return;
+    }
 
     const payload = {
       title: editForm.title,
       body: editForm.body,
-      tags: editForm.tags.split(",").map(t => t.trim()).filter(Boolean)
+      tags: editForm.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
     };
 
     const { data, error } = await supabase
@@ -99,120 +134,295 @@ useEffect(() => {
       return;
     }
 
-    if (data && data[0]) {
-      setPosts(prev => prev.map(p => (p.id === id ? data[0] : p)));
+    if (data?.[0]) {
+      setPosts((current) => current.map((post) => (post.id === id ? data[0] : post)));
     }
 
     cancelEdit();
   };
 
   const deletePost = async (id) => {
-  await supabase
-    .from("posts")
-    .delete()
-    .eq("id", id);
+    const { error } = await supabase.from("posts").delete().eq("id", id);
 
-  setPosts(posts.filter(p => p.id !== id));
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setPosts((current) => current.filter((post) => post.id !== id));
   };
 
   const login = async () => {
     const hash = await hashPassword(pwInput);
-    if (hash === BLOG_PASSWORD_HASH) { setAuthed(true); setShowLogin(false); setPwError(false); setPwInput(""); }
-    else setPwError(true);
+    if (hash === BLOG_PASSWORD_HASH) {
+      setAuthed(true);
+      setShowLogin(false);
+      setPwError(false);
+      setPwInput("");
+      return;
+    }
+
+    setPwError(true);
   };
 
-  const inputStyle = { width: "100%", background: "#2a2a2a", border: "1px solid #3a3a3a", borderRadius: 3, padding: "8px 10px", fontFamily: "Inter, sans-serif", fontSize: 14, color: "#d4d4d4", outline: "none", marginBottom: 10 };
-  const btnStyle = { fontFamily: "Inter, sans-serif", fontSize: 14, color: "#7cb8e8", background: "none", border: "none", cursor: "pointer", padding: 0 };
-
   return (
-    <div style={{ maxWidth: 740, margin: "0 auto", padding: "48px 24px 80px" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #1e1e1e; color: #d4d4d4; font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.7; }
-        a { color: #7cb8e8; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        h1 { font-size: 22px; font-weight: 600; color: #f0f0f0; margin-bottom: 4px; }
-        h2 { font-size: 18px; font-weight: 600; color: #f0f0f0; margin-bottom: 4px; }
-        hr { border: none; border-top: 1px solid #333; margin: 20px 0; }
-        .tag { display: inline-block; font-size: 11px; background: #2a2a2a; color: #888; border: 1px solid #3a3a3a; padding: 1px 7px; border-radius: 3px; margin: 3px 3px 0 0; }
-      `}</style>
-
-      {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <h1>Rudrapratap Chinhara</h1>
-        <div style={{ fontSize: 14, color: "#777", marginBottom: 14 }}>Blog</div>
-        <nav style={{ display: "flex", gap: 18, alignItems: "center" }}>
-          <Link to="/" style={{ fontSize: 14, color: "#888" }}>← home</Link>
-          {!authed
-            ? <button onClick={() => setShowLogin(v => !v)} style={btnStyle}>admin</button>
-            : <>
-                <button onClick={() => setWriting(v => !v)} style={btnStyle}>{writing ? "cancel" : "+ new post"}</button>
-                <button onClick={() => { setAuthed(false); setWriting(false); }} style={{ ...btnStyle, color: "#666" }}>logout</button>
-              </>
-          }
-        </nav>
-      </div>
-
-      <hr />
-
-      {/* Login */}
-      {showLogin && (
-        <div style={{ marginBottom: 32, maxWidth: 300 }}>
-          <input type="password" value={pwInput} onChange={e => { setPwInput(e.target.value); setPwError(false); }} onKeyDown={e => e.key === "Enter" && login()} placeholder="Password" style={inputStyle} />
-          {pwError && <div style={{ fontSize: 13, color: "#e07070", marginBottom: 8 }}>Incorrect password.</div>}
-          <button onClick={login} style={btnStyle}>log in →</button>
+    <div className="academic-site">
+      <header className="academic-topbar">
+        <div className="academic-topbar__inner">
+          <Link to="/" className="academic-brand">
+            Rudrapratap Chinhara
+          </Link>
+          <nav className="academic-nav" aria-label="Blog">
+            <Link to="/">Profile</Link>
+            <a href="#blog-posts">Posts</a>
+          </nav>
         </div>
-      )}
+      </header>
 
-      {/* Write form */}
-      {writing && (
-        <div style={{ marginBottom: 40, borderLeft: "2px solid #333", paddingLeft: 20 }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#d4d4d4", marginBottom: 14 }}>New Post</div>
-          <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Title" style={inputStyle} />
-          <textarea value={form.body} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} placeholder="Write your thoughts..." rows={10} style={{ ...inputStyle, resize: "vertical" }} />
-          <input value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="Tags: ML, Research (comma separated)" style={inputStyle} />
-          <button onClick={publish} style={btnStyle}>publish →</button>
-        </div>
-      )}
+      <div className="academic-shell academic-shell--blog">
+        <aside className="academic-aside academic-aside--blog">
+          <p className="academic-kicker">Notes and Writing</p>
+          <h1>Blog</h1>
+          <p className="academic-role" style={{ textAlign: "justify" }}>
+            I write about my research, thoughts on machine learning and systems, and occasionally share updates about my work. This is also where I post drafts of my papers and projects for early feedback, so stay tuned!
+          </p>
 
-      {/* Posts */}
-      {posts.length === 0 ? (
-        <p style={{ color: "#555", fontSize: 14 }}>No posts yet.</p>
-      ) : (
-        posts.map(p => (
-          <div key={p.id} style={{ marginBottom: 40 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
-              <h2>{p.title}</h2>
-              {authed && <button onClick={() => deletePost(p.id)} style={{ ...btnStyle, color: "#e07070", fontSize: 13, flexShrink: 0 }}>delete</button>}
+          <div className="academic-side-block">
+            <p className="academic-mini-heading">Navigation</p>
+            <div className="academic-contact-list">
+              <Link to="/">Return to profile</Link>
+              <a href="#blog-posts">Jump to posts</a>
             </div>
-            <div style={{ fontSize: 13, color: "#666", marginBottom: 10 }}>{new Date(p.created_at).toLocaleDateString()}</div>
-            {editingId === p.id ? (
-              <div style={{ marginBottom: 10, borderLeft: "2px solid #333", paddingLeft: 16 }}>
-                <input value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} placeholder="Title" style={inputStyle} />
-                <textarea value={editForm.body} onChange={e => setEditForm(f => ({ ...f, body: e.target.value }))} placeholder="Edit post..." rows={10} style={{ ...inputStyle, resize: "vertical" }} />
-                <input value={editForm.tags} onChange={e => setEditForm(f => ({ ...f, tags: e.target.value }))} placeholder="Tags (comma separated)" style={inputStyle} />
-                <div style={{ display: "flex", gap: 16 }}>
-                  <button onClick={() => saveEdit(p.id)} style={btnStyle}>save changes →</button>
-                  <button onClick={cancelEdit} style={{ ...btnStyle, color: "#888" }}>cancel</button>
-                </div>
+          </div>
+
+          <div className="academic-side-block">
+            <p className="academic-mini-heading">Admin</p>
+            <div className="academic-inline-actions">
+              {!authed ? (
+                <button
+                  type="button"
+                  className="academic-button-link academic-button-reset"
+                  onClick={() => setShowLogin((value) => !value)}
+                >
+                  {showLogin ? "Hide login" : "Admin login"}
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="academic-button-link academic-button-reset"
+                    onClick={() => setWriting((value) => !value)}
+                  >
+                    {writing ? "Cancel draft" : "Write new post"}
+                  </button>
+                  <button
+                    type="button"
+                    className="academic-text-button academic-button-reset academic-text-button--muted"
+                    onClick={() => {
+                      setAuthed(false);
+                      setWriting(false);
+                      cancelEdit();
+                    }}
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </aside>
+
+        <main className="academic-content">
+          {showLogin ? (
+            <section className="academic-panel">
+              <div className="academic-section__header">
+                <h2>Admin Login</h2>
+              </div>
+              <input
+                type="password"
+                value={pwInput}
+                onChange={(event) => {
+                  setPwInput(event.target.value);
+                  setPwError(false);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    login();
+                  }
+                }}
+                placeholder="Password"
+                className="academic-input"
+              />
+              {pwError ? <p className="academic-error">Incorrect password.</p> : null}
+              <button type="button" className="academic-button-link academic-button-reset" onClick={login}>
+                Log in
+              </button>
+            </section>
+          ) : null}
+
+          {writing ? (
+            <section className="academic-panel">
+              <div className="academic-section__header">
+                <h2>New Post</h2>
+              </div>
+              <input
+                value={form.title}
+                onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+                placeholder="Title"
+                className="academic-input"
+              />
+              <textarea
+                value={form.body}
+                onChange={(event) => setForm((current) => ({ ...current, body: event.target.value }))}
+                placeholder="Write your thoughts..."
+                rows={10}
+                className="academic-input academic-textarea"
+              />
+              <input
+                value={form.tags}
+                onChange={(event) => setForm((current) => ({ ...current, tags: event.target.value }))}
+                placeholder="Tags: ML, Research, Systems"
+                className="academic-input"
+              />
+              <button type="button" className="academic-button-link academic-button-reset" onClick={publish}>
+                Publish post
+              </button>
+            </section>
+          ) : null}
+
+          <section id="blog-posts" className="academic-section">
+            <div className="academic-section__header academic-section__header--row">
+              <h2>Posts</h2>
+              <p className="academic-small">
+                {loading ? "Loading..." : `${posts.length} post${posts.length === 1 ? "" : "s"}`}
+              </p>
+            </div>
+
+            {loading ? (
+              <p className="academic-muted">Loading posts...</p>
+            ) : posts.length === 0 ? (
+              <div className="academic-callout">
+                <p>No posts yet.</p>
               </div>
             ) : (
-              <>
-                <p style={{ color: "#b0b0b0", whiteSpace: "pre-wrap", display: expanded === p.id ? "block" : "-webkit-box", WebkitLineClamp: expanded === p.id ? "unset" : 6, WebkitBoxOrient: "vertical", overflow: expanded === p.id ? "visible" : "hidden", marginBottom: 10 }}>{p.body}</p>
-                <button onClick={() => setExpanded(expanded === p.id ? null : p.id)} style={btnStyle}>{expanded === p.id ? "show less" : "read more"}</button>
-              </>
-            )}
-            {authed && editingId !== p.id && <div style={{ marginTop: 8 }}><button onClick={() => startEdit(p)} style={{ ...btnStyle, fontSize: 13, color: "#9ccf8f" }}>edit</button></div>}
-            {p.tags?.length > 0 && <div style={{ marginTop: 8 }}>{p.tags.map(t => <span key={t} className="tag">{t}</span>)}</div>}
-            <hr style={{ marginTop: 24 }} />
-          </div>
-        ))
-      )}
+              posts.map((post) => {
+                const clamped = shouldClamp(post.body || "");
+                const isExpanded = expanded === post.id;
 
-      {/* Footer */}
-      <div style={{ marginTop: 40, fontSize: 13, color: "#555", borderTop: "1px solid #333", paddingTop: 18 }}>
-        Rudrapratap Chinhara · M.S. Researcher · Koita Centre for Digital Health · IIT Bombay
+                return (
+                  <article key={post.id} className="academic-post">
+                    <div className="academic-post__head">
+                      <div>
+                        <h3>{post.title}</h3>
+                        <p className="academic-record__meta">{formatDate(post.created_at)}</p>
+                      </div>
+                      {authed ? (
+                        <button
+                          type="button"
+                          className="academic-text-button academic-button-reset academic-text-button--danger"
+                          onClick={() => deletePost(post.id)}
+                        >
+                          Delete
+                        </button>
+                      ) : null}
+                    </div>
+
+                    {editingId === post.id ? (
+                      <div className="academic-panel academic-panel--nested">
+                        <input
+                          value={editForm.title}
+                          onChange={(event) =>
+                            setEditForm((current) => ({ ...current, title: event.target.value }))
+                          }
+                          placeholder="Title"
+                          className="academic-input"
+                        />
+                        <textarea
+                          value={editForm.body}
+                          onChange={(event) =>
+                            setEditForm((current) => ({ ...current, body: event.target.value }))
+                          }
+                          placeholder="Edit post..."
+                          rows={10}
+                          className="academic-input academic-textarea"
+                        />
+                        <input
+                          value={editForm.tags}
+                          onChange={(event) =>
+                            setEditForm((current) => ({ ...current, tags: event.target.value }))
+                          }
+                          placeholder="Tags (comma separated)"
+                          className="academic-input"
+                        />
+                        <div className="academic-inline-actions">
+                          <button
+                            type="button"
+                            className="academic-button-link academic-button-reset"
+                            onClick={() => saveEdit(post.id)}
+                          >
+                            Save changes
+                          </button>
+                          <button
+                            type="button"
+                            className="academic-text-button academic-button-reset academic-text-button--muted"
+                            onClick={cancelEdit}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <p
+                          className={`academic-post__body ${
+                            clamped && !isExpanded ? "academic-post__body--clamped" : ""
+                          }`}
+                        >
+                          {post.body}
+                        </p>
+                        {clamped ? (
+                          <button
+                            type="button"
+                            className="academic-button-link academic-button-reset"
+                            onClick={() => setExpanded(isExpanded ? null : post.id)}
+                          >
+                            {isExpanded ? "Show less" : "Read more"}
+                          </button>
+                        ) : null}
+                      </>
+                    )}
+
+                    {authed && editingId !== post.id ? (
+                      <div className="academic-inline-actions academic-inline-actions--after">
+                        <button
+                          type="button"
+                          className="academic-text-button academic-button-reset"
+                          onClick={() => startEdit(post)}
+                        >
+                          Edit
+                        </button>
+                      </div>
+                    ) : null}
+
+                    {post.tags?.length ? (
+                      <div className="academic-tag-list">
+                        {post.tags.map((tag) => (
+                          <span key={tag} className="academic-tag">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </article>
+                );
+              })
+            )}
+          </section>
+
+          <footer className="academic-footer">
+            Rudrapratap Chinhara · M.S. by Research Student · Koita Centre for Digital Health · IIT Bombay
+          </footer>
+        </main>
       </div>
     </div>
   );
