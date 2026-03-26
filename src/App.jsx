@@ -294,7 +294,7 @@ export default function App() {
                   className="academic-record__authors"
                   dangerouslySetInnerHTML={{ __html: publication.authors }}
                 />
-                <p>{publication.abstract}</p>
+                {/* <p>{publication.abstract}</p> */}
                 {publication.doi && publication.doi !== "TBA" ? (
                   <p className="academic-link-row">
                     <a href={`https://doi.org/${publication.doi}`} target="_blank" rel="noreferrer">
