@@ -1,0 +1,58 @@
+[
+  {
+    "title": "What are Differentiable Knowledge Graphs?",
+    "body": "Differentiable knowledge graphs combine two ideas: structured knowledge (like databases of facts) and machine learning. A traditional knowledge graph stores information as simple facts, (subject, relation, object) and can answer queries logically. However, it struggles when data is incomplete (remember the closed vs open world assumption!), uncertain, or noisy. Differentiable knowledge graphs address this by converting these facts into numerical representations, so machine learning models can process and learn from them.\n\nBecause everything is represented in a continuous vector space, these systems can be trained using standard optimization methods like gradient descent. Instead of exact logical matching, answering the query becomes a ranking task. For example, given (subject, relation, ?), the model scores possible answers and returns the most likely ones. This makes it possible to handle very large datasets efficiently.\n\nThe advantage is that these systems are more flexible, scalable, and work well with modern LLMs. The downside however is that they no longer guarantee perfectly logical answers, they provide the most probable answer instead of an exact one.\n",
+    "tags": [
+      "Neurosymbolic AI",
+      "Knowledge Graphs",
+      "Natural Language Processing"
+    ]
+  },
+  {
+    "title": "DH 899: Communication Skills \u2014 Course Review",
+    "body": "DH 899 is a mandatory non-credit course for MS(R) and PhD students at the Koita Centre for Digital Health, Indian Institute of Technology Bombay. The course is focused on scientific communication, mainly how to read research papers, write them, and present research clearly.\n\nThe lectures are given by professors from multiple departments across IIT Bombay, including the Department of Biosciences and Bioengineering, Department of Electrical Engineering, and KCDH faculty. Because of this, the course ends up covering different perspectives on how research is done and communicated across fields.\n\nOverall, the course is less about technical content and more about developing basic research skills and understanding how to approach academic papers, how to structure your own writing, and how to present research ideas effectively.\n",
+    "tags": [
+      "Digital Health",
+      "Scientific Communication"
+    ]
+  },
+  {
+    "title": "EC 607: Health Econometrics \u2014 Course Review",
+    "body": "EC 607 introduces econometric methods commonly used to analyze healthcare and policy-related data. The course is taught by Prof. Souvik Banerjee.\n\nThe course begins with core econometric models such as linear regression, logit and probit models, and count data models. It then progresses to more advanced causal inference techniques including structural latent factor (SLF) models, MIMIC models, Two-Stage Least Squares (2SLS), Two-Stage Residual Inclusion (2SRI), and bivariate probit models.\n\nThe material is mathematically and conceptually challenging, but the instructor spends sufficient time explaining each topic. Lectures are largely board-based, so careful note-taking during class is necessary.\n\nDespite the technical content, the examinations are relatively manageable. Questions are primarily theoretical with some applied components, and they closely reflect concepts and examples discussed in class.",
+    "tags": [
+      "Health Econometrics",
+      "Causal Analysis",
+      "Advanced Statistics",
+      "STATA"
+    ]
+  },
+  {
+    "title": "DH 801: Biostatistics for Healthcare \u2014 Course Review",
+    "body": "DH 801 introduces statistical methods commonly used in healthcare and biomedical research. The course is divided into two parts and taught by Prof. Ranjith Padinhateeri and Prof. Saket Choudhary.\n\nThe first half focuses on foundational statistics and probability. Topics include basic statistical concepts, probability distributions, hypothesis testing, and statistical inference. This portion builds the mathematical grounding necessary for analyzing healthcare datasets.\n\nThe second half moves into more advanced statistical methods commonly used in applied research. Topics include non-parametric tests, generalized linear models (GLMs), linear regression, and regularization techniques. The emphasis is on practical statistical tools that are widely used in epidemiology, biomedical research, and healthcare analytics. This portion also requires solid working knowledge of R, as the assignments involve implementing statistical analyses and working with real datasets.\n\nThe assignments in the second half are particularly interesting because they reflect the type of practical analytical tasks expected from biomedical data scientists, offering exposure to real-world statistical workflows used in health and biomedical research.\n\nOverall, the course provides a solid statistical foundation for students working with health and biomedical data, particularly those transitioning from computational or engineering backgrounds into health research.",
+    "tags": [
+      "Biostatistics",
+      "R"
+    ]
+  },
+  {
+    "title": "DH 308: Clinical Data Management \u2014 Course Review",
+    "body": "DH 308 provides an introduction to the fundamentals of clinical data management and the broader digital health ecosystem. The course is conceptually straightforward and does not require significant technical background to follow.\n\nThe course is divided into two parts. The first half, taught by Prof. Nirmal Punjabi, focuses on clinical trial design and the principles underlying clinical research. This section covers study structure, data collection practices, and key considerations in designing robust clinical trials. Classroom discussions during this part are often engaging, particularly around practical aspects of trial design.\n\nThe second half, taught by Prof. Kalyani Addya, shifts toward health information systems and digital health infrastructure, with specific discussion of India's Ayushman Bharat Digital Mission (ABDM) framework and its role in healthcare data interoperability.\n\nThe course material itself is relatively easy to follow, though the mid-semester examination can be challenging because the questions typically emphasize conceptual reasoning rather than rote recall.\n\nOverall, DH 308 is most relevant for students interested in digital health and healthcare data systems. It complements DH 302 (Introduction to Public Health Informatics) well, as both courses together provide a basic foundation for understanding public health research and healthcare data management.\n",
+    "tags": [
+      "Digital Health",
+      "Clinical Trials",
+      "Health Informatics",
+      "Health Data Management"
+    ]
+  },
+  {
+    "title": "DH 302: Introduction to Public Health Informatics \u2014 Course Review",
+    "body": "DH 302 is the only mandatory course for MSR and PhD students at the Koita Centre for Digital Health and is typically offered in the Autumn semester. The course provides a broad introduction to public health informatics and the research ecosystem surrounding population health. The course is split into two parts and taught by Prof. Saket Choudhary and Prof. Nirmal Punjabi.\n\nThe first half focuses on applying statistical reasoning to public health data. Topics include working with epidemiological datasets, interpreting population-level health statistics, and understanding how data informs public health decisions. The second half shifts toward research frameworks in healthcare. This section introduces study design, fundamentals of clinical trials, and common methodologies used in public health research.\n\nThe course is particularly useful for students from computer science, AI, statistics, or economics backgrounds who want exposure to the healthcare domain. It is not mathematically rigorous, but it provides a useful overview of the field and establishes foundational concepts needed to understand public health research.\n\nThe workload is relatively light. Spending roughly one to two hours per week is sufficient to keep up with lectures and assignments. There are no formal prerequisites. Familiarity with basic statistics, probability, and linear algebra is sufficient to follow the material. It is recommended to know R and Python as the assignments in the first half require solid programming skills.",
+    "tags": [
+      "Public Health",
+      "Data Analysis",
+      "Statistics",
+      "R",
+      "Python"
+    ]
+  }
+]
