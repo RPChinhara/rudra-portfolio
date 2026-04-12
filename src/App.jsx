@@ -125,9 +125,9 @@ function Section({ id, title, children }) {
   );
 }
 
-function Record({ title, meta, children, tags }) {
+function Record({ title, meta, children, tags, className = "" }) {
   return (
-    <article className="academic-record">
+    <article className={`academic-record ${className}`.trim()}>
       <div className="academic-record__header">
         <h3>{title}</h3>
         {meta ? <p className="academic-record__meta">{meta}</p> : null}
@@ -148,7 +148,7 @@ function Record({ title, meta, children, tags }) {
 
 export default function App() {
   return (
-    <div className="academic-site">
+    <div className="academic-site academic-site--home">
       <header className="academic-topbar">
         <div className="academic-topbar__inner">
           <Link to="/" className="academic-brand">
@@ -256,8 +256,16 @@ export default function App() {
             {RESUME.education.map((item) => (
               <Record
                 key={item.degree}
+                className="academic-record--education"
                 title={item.degree}
-                meta={`${item.school} · ${item.period}`}
+                meta={
+                  <>
+                    <span className="academic-record__meta-line">{item.school}</span>
+                    <span className="academic-record__meta-line academic-record__meta-line--subtle">
+                      {item.period}
+                    </span>
+                  </>
+                }
               >
                 <p className="academic-gpa">
                   <span className="academic-gpa__label">GPA</span>
