@@ -98,15 +98,8 @@ export default function BlogPage() {
 
         <main className="academic-content">
           <section id="blog-posts" className="academic-section">
-            <div className="academic-section__header academic-section__header--row">
+            <div className="academic-section__header">
               <h2>Posts</h2>
-              <p className="academic-small">
-                {loading
-                  ? "Loading..."
-                  : error
-                    ? "Unavailable"
-                    : `${posts.length} post${posts.length === 1 ? "" : "s"}`}
-              </p>
             </div>
 
             {loading ? (
@@ -142,7 +135,7 @@ export default function BlogPage() {
                     {clamped ? (
                       <button
                         type="button"
-                        className="academic-button-link academic-button-reset"
+                        className="academic-inline-link academic-button-reset"
                         onClick={() => setExpanded(isExpanded ? null : post.id)}
                       >
                         {isExpanded ? "Show less" : "Read more"}
